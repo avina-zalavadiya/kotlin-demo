@@ -1,0 +1,46 @@
+import kotlinx.coroutines.*
+import java.util.concurrent.atomic.AtomicInteger
+import kotlin.system.measureTimeMillis
+
+
+suspend fun buildCar() {
+    val n = 30_00_000  // number of car
+    val counter = AtomicInteger()
+
+    val t = arrayListOf<Long>()
+    val time = measureTimeMillis {
+
+      coroutineScope {
+          val job = launch {
+              repeat(n) {
+                  launch {
+                      val abc = measureTimeMillis {
+                          delay(5000L)
+                          delay(5000L)
+                          delay(10000L)
+                          delay(15000L)
+                          delay(15000L)
+                      }
+                      t.add(abc)
+                  }
+                  counter.incrementAndGet()
+              }
+          }
+          launch {
+              delay(55000L)
+              job.cancel();
+           }
+        }
+    }
+
+    println("Build $counter car in $time ms")
+    println("time to build a car in${(t.average())} ms")
+
+
+}
+
+fun main() = runBlocking {
+    println("Car building start---------------")
+    buildCar()
+    println("Car built------")
+}
